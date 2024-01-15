@@ -24,7 +24,7 @@ function Header() {
   }, [location.pathname]);
 
   return (
-    <header className="bg-emerald-100 shadow-md">
+    <header className="bg-slate-100 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to='/'>
           <h1 className="flex flex-wrap items-center font-bold text-sm sm:text-xl">
@@ -34,7 +34,7 @@ function Header() {
             <span className="text-indigo-600">Depth</span>
           </h1>
         </Link>
-        <form action="" className="flex items-center bg-slate-100 border-double border-4 border-indigo-600 p-3 rounded-lg">
+        <form action="" className="flex items-center bg-slate-100 p-3 rounded-lg">
           <input type="text" name="search" id="search" placeholder="Search..." className="bg-transparent focus:outline-none w-24 sm:w-64" />
           <FaSearch className='text-slate-500' />
         </form>
@@ -48,6 +48,9 @@ function Header() {
           <li>
             {buttonClicked || location.pathname === '/sign-in' ? (
               <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-gray-600 focus:ring focus:border-indigo-300`} disabled>Signing In...</button>
+            ) :
+            buttonClicked || location.pathname === '/sign-up' ? (
+              <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-gray-600 focus:ring focus:border-indigo-300`} disabled>Signing Up...</button>
             ) : (
               <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md focus:outline-none focus:bg-gray-600 focus:ring focus:border-indigo-300`} onClick={handleButtonClick}>Sign In</button>
             )}
