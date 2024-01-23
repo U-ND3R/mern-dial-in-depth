@@ -34,7 +34,7 @@ function Header() {
             <span className="text-indigo-600">Depth</span>
           </h1>
         </Link>
-        <form action="" className="flex items-center bg-slate-100 p-3 rounded-lg">
+        <form action="" className="flex items-center bg-slate-100 p-3 rounded-lg border-solid border-2 border-indigo-600">
           <input type="text" name="search" id="search" placeholder="Search..." className="bg-transparent focus:outline-none w-24 sm:w-64" />
           <FaSearch className='text-slate-500' />
         </form>
@@ -47,12 +47,12 @@ function Header() {
           </Link>
           <li>
             {buttonClicked || location.pathname === '/sign-in' ? (
-              <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-gray-600 focus:ring focus:border-indigo-300`} disabled>Signing In...</button>
+              <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-indigo-600 focus:ring focus:border-indigo-300`} disabled>Signing In...</button>
             ) :
             buttonClicked || location.pathname === '/sign-up' ? (
-              <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-gray-600 focus:ring focus:border-indigo-300`} disabled>Signing Up...</button>
+              <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-indigo-600 focus:ring focus:border-indigo-300`} disabled>Signing Up...</button>
             ) : (
-              <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md focus:outline-none focus:bg-gray-600 focus:ring focus:border-indigo-300`} onClick={handleButtonClick}>Sign In</button>
+              <button className={`bg-indigo-800 text-white px-4 py-2 rounded-md focus:outline-none focus:bg-indigo-600 focus:ring focus:border-indigo-300`} onClick={handleButtonClick}>Sign In</button>
             )}
           </li>
         </ul>
