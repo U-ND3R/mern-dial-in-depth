@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
-import { validateUsername, validateEmail, validatePassword } from "../utils/Validators.jsx";
+import { validateUsername, validateEmail, validatePassword } from "../../../api/utils/Validators.jsx";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
@@ -91,15 +91,15 @@ const SignUp = () => {
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
       <form action="" className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        <input type="text" placeholder="Username" className={`border p-3 rounded-lg ${usernameError ? "border-red-500" : touchedFields.username && formData.username ? "border-green-500" : ""}`} id="username" onChange={handleChange} />
+        <input type="text" placeholder="Username" className={`border p-3 rounded-lg ${usernameError ? "border-red-500" : touchedFields.username && formData.username ? "border-green-500" : ""}`} id="username" onChange={handleChange} required />
         {usernameError && <ul className="mt-1">{renderError(usernameError)}</ul>}
         {!usernameError && touchedFields.username && formData.username && <ul className="mt-1">{renderSuccess("Username")}</ul>}
 
-        <input type="email" placeholder="Email" className={`border p-3 rounded-lg ${emailError ? "border-red-500" : touchedFields.email && formData.email ? "border-green-500" : ""}`} id="email" onChange={handleChange} />
+        <input type="email" placeholder="Email" className={`border p-3 rounded-lg ${emailError ? "border-red-500" : touchedFields.email && formData.email ? "border-green-500" : ""}`} id="email" onChange={handleChange} required />
         {emailError && <ul className="mt-1">{renderError(emailError)}</ul>}
         {!emailError && touchedFields.email && formData.email && <ul className="mt-1">{renderSuccess("Email")}</ul>}
 
-        <input type="password" placeholder="Password" className={`border p-3 rounded-lg ${passwordError ? "border-red-500" : touchedFields.password && formData.password ? "border-green-500" : ""}`} id="password" onChange={handleChange} />
+        <input type="password" placeholder="Password" className={`border p-3 rounded-lg ${passwordError ? "border-red-500" : touchedFields.password && formData.password ? "border-green-500" : ""}`} id="password" onChange={handleChange} required />
         {passwordError && <ul className="mt-1">{renderError(passwordError)}</ul>}
         {!passwordError && touchedFields.password && formData.password && <ul className="mt-1">{renderSuccess("Password")}</ul>}
 
