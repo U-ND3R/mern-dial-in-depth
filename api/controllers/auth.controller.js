@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -34,6 +35,24 @@ export const checkEmail = async (req, res) => {
     res.json({ exists: !!user });
   } catch (error) {
     console.error('Error checking email in the database:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const signin = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user && bcryptjs.compareSync(password, user.password)) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const { password: pass, ...rest } = user._doc;
+      res.cookie('access_token', token, { httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }).status(200).json({ success: true, message: "User signed in successfully", rest });
+    } else {
+      res.status(401).json({ success: false, message: "Invalid username or password" });
+    }
+  } catch (error) {
+    console.error('Error signing in:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
