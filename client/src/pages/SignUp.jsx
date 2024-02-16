@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
-import { FaXmark } from "react-icons/fa6";
-import { validateUsername, validateEmail, validatePassword } from "../../../api/utils/Validators.jsx";
+import { FaXmark } from "react-icons/fa6"
+import { validateUsername, validateEmail, validatePassword } from "../../../api/utils/Validators.js";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
@@ -11,19 +11,30 @@ const SignUp = () => {
   const [emailError, setEmailError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [touchedFields, setTouchedFields] = useState({});
+  const [countdown, setCountdown] = useState(null);
+  const [signupMessage, setSignupMessage] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = async (e) => {
     const inputValue = e.target.value;
     const fieldId = e.target.id;
+  
     setFormData({
       ...formData,
       [fieldId]: inputValue,
     });
-    setTouchedFields({
-      ...touchedFields,
+  
+    setTouchedFields((prevTouchedFields) => ({
+      ...prevTouchedFields,
       [fieldId]: true,
+    }));
+  
+    Object.keys(touchedFields).forEach((field) => {
+      if (field !== fieldId) {
+        validateField(field, formData[field]);
+      }
     });
+  
     if (!inputValue) {
       setUsernameError(null);
       setEmailError(null);
@@ -33,17 +44,16 @@ const SignUp = () => {
     }
   };
   
-  const validateField = async (field, value) => {
+  const validateField = async (field, value, checkExistence = true) => {
     if (touchedFields[field] || value) {
       let error = null;
-  
       switch (field) {
         case "username":
-          error = await validateUsername(value);
+          error = await validateUsername(value, checkExistence);
           setUsernameError(error);
           break;
         case "email":
-          error = await validateEmail(value);
+          error = await validateEmail(value, checkExistence);
           setEmailError(error);
           break;
         case "password":
@@ -53,6 +63,10 @@ const SignUp = () => {
         default:
           break;
       }
+    } else {
+      setUsernameError(null);
+      setEmailError(null);
+      setPasswordError(null);
     }
   };
   
@@ -60,7 +74,7 @@ const SignUp = () => {
     return (
       <li className="flex items-center text-red-500">
         <span className="mr-2"><FaXmark className="text-red-500" /></span>
-        {`Input error: ${error}`}
+        {`${error}`}
       </li>
     );
   };
@@ -76,19 +90,45 @@ const SignUp = () => {
 
   const isFormValid = !usernameError && !emailError && !passwordError;
 
+  const startCountdown = () => {
+    let seconds = 10;
+    setCountdown(seconds);
+
+    const countdownInterval = setInterval(() => {
+      setCountdown((prevCountdown) => prevCountdown - 1);
+    }, 1000);
+
+    setTimeout(() => {
+      clearInterval(countdownInterval);
+      setCountdown(null);
+    }, seconds * 1000);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      setLoading(false);
-      navigate('/sign-in');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setSignupMessage({
+        type: "success",
+        content: "User successfully created. Redirecting in 10 seconds",
+      });
+      startCountdown();
+      setTimeout(() => {
+        navigate('/sign-in');
+      }, 10000);
     } catch (error) {
+      console.error("Error during sign-up:", error);
+      setSignupMessage({
+        type: "error",
+        content: "An unexpected error occurred during sign-up",
+      });
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-3 max-w-lg mx-auto">
+    <div className="p-3 pt-16 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
       <form action="" className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input type="text" placeholder="Username" className={`border p-3 rounded-lg ${usernameError ? "border-red-500" : touchedFields.username && formData.username ? "border-green-500" : ""}`} id="username" onChange={handleChange} required />
@@ -103,15 +143,27 @@ const SignUp = () => {
         {passwordError && <ul className="mt-1">{renderError(passwordError)}</ul>}
         {!passwordError && touchedFields.password && formData.password && <ul className="mt-1">{renderSuccess("Password")}</ul>}
 
-        <button className={loading || isFormValid ? `bg-indigo-800 text-white px-4 py-2 rounded-md focus:outline-none focus:bg-indigo-600 focus:ring focus:border-indigo-300` : `bg-indigo-800 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-indigo-600 focus:ring focus:border-indigo-300` } disabled={loading || !isFormValid}>
-          {loading ? "Loading..." : isFormValid ? "Sign Up" : "Errors occured"}
+        <button className={loading || !isFormValid ? "button-disabled" : "button-stable"} disabled={loading || !isFormValid}>
+          {loading ? "Loading..." : isFormValid ? countdown ? `Redirecting in ${countdown}s` : "Sign Up" : "Errors occurred"}
         </button>
       </form>
 
-      <div className="flex gap-2 mt-5">
-        <p>Have an Account?</p>
-        <Link to={"/sign-in"}>
-          <span className="text-indigo-700 hover:underline">Sign In</span>
+      {signupMessage && signupMessage.type === 'error' && (
+        <div className={`mt-4 text-red-500`}>
+          {signupMessage.content}
+        </div>
+      )}
+
+      {signupMessage && signupMessage.type === 'success' && (
+        <div className={`mt-4 text-green-500`}>
+          {signupMessage.content}
+        </div>
+      )}
+
+      <div className="flex gap-2 items-center my-8">
+        <h2 className="text-black">Have an Account?</h2>
+        <Link to={"/sign-in"} className="link-effect">
+          <span className="text-indigo-700">Sign In</span>
         </Link>
       </div>
     </div>

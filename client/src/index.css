@@ -5,3 +5,27 @@
 body {
     background-color: rgb(238, 245, 255);
 }
+
+.button-stable {
+    @apply bg-indigo-800 text-white px-4 py-2 rounded-md focus:outline-none focus:bg-indigo-600 focus:ring focus:border-indigo-300;
+}
+
+.button-disabled {
+    @apply bg-gray-400 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-indigo-300 focus:ring focus:border-indigo-400;
+}
+
+.link-effect {
+    @apply text-indigo-700 mx-4 py-2 relative transition duration-300 ease-out delay-100;
+}
+
+.link-effect:after {
+    @apply h-1 w-full bg-indigo-700 content-[''];
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    @apply transform scale-x-0 transition duration-300;
+}
+
+.link-effect:hover:after {
+    @apply transform scale-x-100;
+}
