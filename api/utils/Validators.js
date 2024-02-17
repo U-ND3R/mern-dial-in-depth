@@ -33,7 +33,6 @@ export const validateEmail = async (value, checkExistence) => {
     if (checkExistence && data.exists) {
       return errorHandler(400, "Email is already registered");
     }
-  
     return null;
 };
   

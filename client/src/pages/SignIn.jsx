@@ -4,16 +4,19 @@ import { FaCheck } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { validateEmail, validatePassword } from "../../../api/utils/Validators.js";
 import { errorHandler } from "../../../api/utils/Errors.js";
+import { useDispatch, useSelector } from "react-redux";
+import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice.js";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [touchedFields, setTouchedFields] = useState({});
   const [signinMessage, setSigninMessage] = useState(null);
   const [redirectCountdown, setRedirectCountdown] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.user);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -94,10 +97,9 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setFormSubmitted(true);
-
     try {
+      dispatch(signInStart());
       const response = await fetch("/api/auth/sign-in", {
         method: "POST",
         headers: {
@@ -113,6 +115,7 @@ const SignIn = () => {
           type: "success",
           content: "You have successfully logged in"
         });
+        dispatch(signInSuccess(data));
         setRedirectCountdown(10);
         setTimeout(() => {
           navigate('/profile');
@@ -120,13 +123,13 @@ const SignIn = () => {
       } else {
         console.error("Sign-in failed:", data.message);
         setSigninMessage({ type: "error", content: data.message });
+        dispatch(signInFailure(data.message));
       }
     } catch (error) {
       console.error("Error during sign-in:", error);
       const errorMessage = errorHandler(error);
       setSigninMessage({ type: "error", content: errorMessage || "An unexpected error occurred during sign-in" });
-    } finally {
-      setLoading(false);
+      dispatch(signInFailure(error.message));
     }
   };
 
