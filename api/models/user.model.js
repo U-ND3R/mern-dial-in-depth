@@ -17,6 +17,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    company: {
+        type: String,
+        default: "",
+    },
+
+    fname: {
+        type: String,
+        default: "",
+    },
+
+    lname: {
+        type: String,
+        default: "",
+    },
+
+    position: {
+        type: String,
+        default: "",
+    },
 },{ timestamps: true });
 
 const User = mongoose.model('User', userSchema);

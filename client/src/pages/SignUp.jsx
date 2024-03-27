@@ -107,15 +107,29 @@ const SignUp = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setSignupMessage({
-        type: "success",
-        content: "User successfully created. Redirecting in 10 seconds",
+      const response = await fetch("/api/auth/sign-up", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-      startCountdown();
-      setTimeout(() => {
-        navigate('/sign-in');
-      }, 10000);
+    
+      const data = await response.json();
+    
+      if (response.ok) {
+        setSignupMessage({
+          type: "success",
+          content: "User successfully created.",
+        });
+        startCountdown();
+        setTimeout(() => {
+          navigate('/sign-in');
+        }, 10000);
+      } else {
+        console.error("Sign-up failed:", data.message);
+        setSignupMessage({ type: "error", content: data.message });
+      }
     } catch (error) {
       console.error("Error during sign-up:", error);
       setSignupMessage({
@@ -143,7 +157,7 @@ const SignUp = () => {
         {passwordError && <ul className="mt-1">{renderError(passwordError)}</ul>}
         {!passwordError && touchedFields.password && formData.password && <ul className="mt-1">{renderSuccess("Password")}</ul>}
 
-        <button className={loading || !isFormValid ? "button-disabled" : "button-stable"} disabled={loading || !isFormValid}>
+        <button className={loading || !isFormValid || countdown ? "button-disabled" : "button-stable"} disabled={loading || !isFormValid || countdown}>
           {loading ? "Loading..." : isFormValid ? countdown ? `Redirecting in ${countdown}s` : "Sign Up" : "Errors occurred"}
         </button>
       </form>

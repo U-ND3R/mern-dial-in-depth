@@ -145,7 +145,7 @@ const SignIn = () => {
         {passwordError && <ul className="mt-1">{renderError(passwordError)}</ul>}
         {signinMessage && signinMessage.type === 'success' && formSubmitted && (<ul className="mt-1">{renderSuccess("Password")}</ul>)}
 
-        <button className={`button-stable ${loading || !isFormValid || redirectCountdown ? 'opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400': ''}`} disabled={loading || !isFormValid || redirectCountdown}>
+        <button className={`${loading || !isFormValid || redirectCountdown ? 'button-disabled': 'button-stable'}`} disabled={loading || !isFormValid || redirectCountdown}>
           {loading ? 'Loading...' : isFormValid ? redirectCountdown ? `Redirecting in ${redirectCountdown}s` : 'Sign In' : 'Errors occurred'}
         </button>
       </form>
@@ -162,7 +162,7 @@ const SignIn = () => {
         </div>
       )}
 
-      <div className="flex gap-2 items-center my-8">
+      <div className="flex gap-2 items-center mt-8">
         <h2 className="text-black">Don&apos;t have an Account?</h2>
         <Link to={"/sign-up"} className="link-effect">
           <span className="text-indigo-700">Sign Up</span>

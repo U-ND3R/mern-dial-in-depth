@@ -10,8 +10,12 @@ body {
     @apply bg-indigo-800 text-white px-4 py-2 rounded-md focus:outline-none focus:bg-indigo-600 focus:ring focus:border-indigo-300;
 }
 
+.button-danger {
+    @apply bg-red-500 text-white px-4 py-2 rounded-md focus:outline-none focus:bg-red-600 focus:ring focus:border-red-300;
+}
+
 .button-disabled {
-    @apply bg-gray-400 text-white px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-indigo-300 focus:ring focus:border-indigo-400;
+    @apply bg-gray-400 text-black px-4 py-2 rounded-md opacity-50 cursor-not-allowed disabled:opacity-50 disabled:bg-gray-400 focus:outline-none focus:bg-indigo-300 focus:ring focus:border-indigo-400;
 }
 
 .link-effect {
@@ -29,3 +33,11 @@ body {
 .link-effect:hover:after {
     @apply transform scale-x-100;
 }
+
+.danger {
+    @apply text-red-500;
+}
+
+.link-effect:after.danger {
+    @apply bg-red-500;
+  }
