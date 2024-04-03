@@ -107,7 +107,7 @@ const SignUp = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/sign-up", {
+      const res = await fetch("/api/auth/sign-up", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,9 +115,9 @@ const SignUp = () => {
         body: JSON.stringify(formData),
       });
     
-      const data = await response.json();
+      const data = await res.json();
     
-      if (response.ok) {
+      if (res.ok) {
         setSignupMessage({
           type: "success",
           content: "User successfully created.",

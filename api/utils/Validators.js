@@ -1,5 +1,5 @@
 import { errorHandler } from "./Errors.js";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
 export const validateUsername = async (value, checkExistence) => {
   const hasInvalidCharacters = /[^a-zA-Z0-9]/.test(value);
@@ -62,28 +62,33 @@ export const validatePassword = async (value) => {
 };
 
 export const validateText = async (value) => {
-  const capitalizedValue = value.charAt(0).toUpperCase() + value.slice(1);
   const regex = /^[a-zA-Z]+$/;
   if (!regex.test(value)) {
     return errorHandler(400, "Only letters are allowed");
   }
-
-  return capitalizedValue;
+  
+  return null;
 };
 
-export const verifyToken = (req, res, next) => {
+export const validateCompany = async (value) => {
+  const regex = /^[a-zA-Z0-9\s]+$/;
+  if (!regex.test(value)) {
+    return errorHandler(400, "Only letters, numbers, and spaces are allowed");
+  }
+
+  return null;
+};
+
+export const verifyToken = async (req, res, next) => {
   const token = req.cookies.access_token;
-
-  if(!token) {
+  if (!token) {
     return next(errorHandler(401, "Unauthorized"));
-  };
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return next(errorHandler(403, "Forbidden"));
-    }
-    req.user = user;
+  }
+  try {
+    const { payload: { userId } } = await jwtVerify(token, process.env.JWT_SECRET);
+    req.userId = userId;
     next();
-  });
-
-}
+  } catch (error) {
+    return next(errorHandler(403, "Forbidden"));
+  }
+};

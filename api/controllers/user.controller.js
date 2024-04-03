@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 import { errorHandler } from "../utils/Errors.js";
-import bcryptjs from "bcryptjs"
+import bcryptjs from "bcryptjs";
 
 export const checkUsername = async (req, res) => {
   const { username } = req.query;
@@ -27,30 +27,34 @@ export const checkEmail = async (req, res) => {
 };
 
 export const updateUser = async (req, res, next) => {
-  if(req.user.id !== req.params.id) {
+  if (req.user.id !== req.params.id) {
     return next(errorHandler(401, "You can only update your own account"));
   }
 
   try {
-    if(req.body.password) {
-      req.body.password = bcryptjs.hashSync(req.body.password, 10)
+    const updateFields = {
+      username: req.body.username,
+      email: req.body.email,
+      fname: req.body.fname,
+      lname: req.body.lname,
+      company: req.body.company,
+      position: req.body.position,
+    };
+
+    if (req.body.password) {
+      updateFields.password = bcryptjs.hashSync(req.body.password, 10);
     }
 
-    const updateUser = await User.findByIdAndUpdate(req.params.id, {
-      $set: {
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
-        fname: req.body.fname,
-        lname: req.body.lname,
-        company: req.body.company,
-        position: req.body.position,
-      }
-    }, { new: true })
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, { $set: updateFields }, { new: true });
 
-    const { password, ...rest } = updateUser._doc;
+    if (!updatedUser) {
+      return next(errorHandler(404, "User not found"));
+    }
+
+    const { password, ...rest } = updatedUser._doc;
     res.status(200).json(rest);
   } catch (error) {
-    next(error)
+    console.error("Error updating user:", error);
+    next(errorHandler(500, "Internal Server Error"));
   }
-}
+};

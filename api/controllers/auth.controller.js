@@ -1,7 +1,12 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/Errors.js";
+import { jwtVerify } from "jose";
+
+const generateToken = (userId) => {
+  const token = JWT.sign({ userId }, process.env.JWT_SECRET);
+  return token;
+};
 
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -30,51 +35,34 @@ export const signup = async (req, res, next) => {
   }
 };
 
-export const checkUsername = async (req, res) => {
-  const { username } = req.query;
-
-  try {
-    const user = await User.findOne({ username });
-    res.json({ exists: !!user });
-  } catch (error) {
-    console.error('Error checking username in the database:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-export const checkEmail = async (req, res) => {
-  const { email } = req.query;
-
-  try {
-    const user = await User.findOne({ email });
-    res.json({ exists: !!user });
-  } catch (error) {
-    console.error('Error checking email in the database:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-export const signin = async (req, res) => {
+export const signin = async (req, res, next) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email });
-    
-    if (!user) {
-      const emailError = errorHandler(401, "Invalid email");
-      return res.status(emailError.statusCode).json({ success: false, message: emailError.message });
+    if (!user || !bcryptjs.compareSync(password, user.password)) {
+      const authError = errorHandler(401, "Invalid credentials");
+      return res.status(authError.statusCode).json({ success: false, message: authError.message });
     }
 
-    if (bcryptjs.compareSync(password, user.password)) {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      const { password: pass, ...rest } = user._doc;
-      res.cookie('access_token', token, { httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }).status(200).json({ success: true, message: "User signed in successfully", rest });
-    } else {
-      const passwordError = errorHandler(401, "Invalid password");
-      res.status(passwordError.statusCode).json({ success: false, message: passwordError.message });
-    }
+    const token = generateToken(user._id);
+    const { password: pass, ...rest } = user._doc;
+    res.cookie('access_token', token, { httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }).status(200).json({ success: true, message: "User signed in successfully", rest });
   } catch (error) {
     const customError = errorHandler(500, "Internal Server Error");
-    res.status(customError.statusCode).json({ success: false, message: customError.message });
+    next(customError);
+  }
+};
+
+export const verifyToken = async (req, res, next) => {
+  const token = req.cookies.access_token;
+  if (!token) {
+    return next(errorHandler(401, "Unauthorized"));
+  }
+  try {
+    const { userId } = await jwtVerify(token, process.env.JWT_SECRET);
+    req.userId = userId;
+    next();
+  } catch (error) {
+    return next(errorHandler(403, "Forbidden"));
   }
 };

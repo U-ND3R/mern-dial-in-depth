@@ -40,4 +40,4 @@ body {
 
 .link-effect:after.danger {
     @apply bg-red-500;
-  }
+}

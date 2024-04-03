@@ -32,23 +32,23 @@ const SignIn = () => {
   const handleChange = async (e) => {
     const inputValue = e.target.value;
     const fieldId = e.target.id;
-
+  
     setFormData({
       ...formData,
       [fieldId]: inputValue,
     });
-
+  
     setTouchedFields({
       ...touchedFields,
       [fieldId]: true,
     });
-
-    Object.keys(touchedFields).forEach((field) => {
-      if (field !== fieldId) {
-        validateField(field, formData[field]);
-      }
-    });
-
+  
+    if (fieldId === "email") {
+      setEmailError(null);
+    } else if (fieldId === "password") {
+      setPasswordError(null);
+    }
+  
     if (!inputValue) {
       setEmailError(null);
       setPasswordError(null);
@@ -100,17 +100,18 @@ const SignIn = () => {
     setFormSubmitted(true);
     try {
       dispatch(signInStart());
-      const response = await fetch("/api/auth/sign-in", {
+      const res = await fetch("/api/auth/sign-in", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        // If the sign-in is successful, set the sign-in message and redirect to the profile page
         setSigninMessage({
           type: "success",
           content: "You have successfully logged in"
@@ -121,11 +122,13 @@ const SignIn = () => {
           navigate('/profile');
         }, 10000);
       } else {
+        // If there's an error during sign-in, display the error message
         console.error("Sign-in failed:", data.message);
         setSigninMessage({ type: "error", content: data.message });
         dispatch(signInFailure(data.message));
       }
     } catch (error) {
+      // If there's an unexpected error, display a generic error message
       console.error("Error during sign-in:", error);
       const errorMessage = errorHandler(error);
       setSigninMessage({ type: "error", content: errorMessage || "An unexpected error occurred during sign-in" });
